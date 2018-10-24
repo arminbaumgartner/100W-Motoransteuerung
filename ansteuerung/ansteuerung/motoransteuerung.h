@@ -133,6 +133,7 @@ ISR(PCINT0_vect)
 		vor = richtung;
 	}
 	
+	vor=1;		//Test
 	
 	if(vor)		//Schalter AUS(vorwärts)	ACHTUNG: es wird PINB abgefragt nicht sufe (0x10)
 	{	
@@ -146,8 +147,8 @@ ISR(PCINT0_vect)
 				//PORTB = PHASE_B_GND1;
 				//PORTB = PHASE_B_GND2;
 				PORTB = PHASE_B_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
-				//PORTC = PHASE_A_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
+				TCCR4E = PHASE_A_PWM;
 				break;
 			}
 			case 0x01:				//HALL_A
@@ -157,8 +158,8 @@ ISR(PCINT0_vect)
 				//PORTD = PHASE_C_GND1;
 				//PORTD = PHASE_C_GND2;
 				PORTD = PHASE_C_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
-				//PORTC = PHASE_A_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
+				TCCR4E = PHASE_A_PWM;
 				break;
 			}
 			case 0x03:				//HALL_A + HALL_B
@@ -168,8 +169,8 @@ ISR(PCINT0_vect)
 				//PORTD = PHASE_C_GND1;
 				//PORTD = PHASE_C_GND2;
 				PORTD = PHASE_C_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
-				//PORTB = PHASE_B_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
+				TCCR4E = PHASE_B_PWM;
 				break;
 			}
 			case 0x02:				//HALL_B
@@ -179,8 +180,8 @@ ISR(PCINT0_vect)
 				//PORTC = PHASE_A_GND1;
 				//PORTC = PHASE_A_GND2;
 				PORTC = PHASE_A_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
-				//PORTB = PHASE_B_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
+				TCCR4E = PHASE_B_PWM;
 				break;
 			}
 			case 0x06:			//HALL_B + HALL_C
@@ -190,8 +191,8 @@ ISR(PCINT0_vect)
 				//PORTC = PHASE_A_GND1;
 				//PORTC = PHASE_A_GND2;
 				PORTC = PHASE_A_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
-				//PORTD = PHASE_C_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
+				TCCR4E = PHASE_C_PWM;
 				break;			
 			}
 			case 0x04:			//HALL_C
@@ -201,8 +202,8 @@ ISR(PCINT0_vect)
 				//PORTB = PHASE_B_GND1;
 				//PORTB = PHASE_B_GND2;
 				PORTB = PHASE_B_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
-				//PORTD = PHASE_C_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
+				TCCR4E = PHASE_C_PWM;
 				break;
 			}
 			default:
@@ -223,8 +224,8 @@ ISR(PCINT0_vect)
 				//PORTC = PHASE_A_GND1;
 				//PORTC = PHASE_A_GND2;
 				PORTC = PHASE_A_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
-				//PORTB = PHASE_B_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
+				TCCR4E = PHASE_B_PWM;
 				break;
 			}
 			case 0x01:			//HALL_A
@@ -234,8 +235,8 @@ ISR(PCINT0_vect)
 				//PORTC = PHASE_A_GND1;
 				//PORTC = PHASE_A_GND2;
 				PORTC = PHASE_A_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
-				//PORTD = PHASE_C_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
+				TCCR4E = PHASE_C_PWM;
 				break;
 			}
 			case 0x03:			//HALL_A + HALL_B
@@ -245,8 +246,8 @@ ISR(PCINT0_vect)
 				//PORTB = PHASE_B_GND1;
 				//PORTB = PHASE_B_GND2;
 				PORTB = PHASE_B_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
-				//PORTD = PHASE_C_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
+				TCCR4E = PHASE_C_PWM;
 				break;
 			}
 			case 0x02:			//HALL_B
@@ -256,8 +257,8 @@ ISR(PCINT0_vect)
 				//PORTB = PHASE_B_GND1;
 				//PORTB = PHASE_B_GND2;
 				PORTB = PHASE_B_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
-				//PORTC = PHASE_A_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
+				TCCR4E = PHASE_A_PWM;
 				break;
 			}
 			case 0x06:			//HALL_B + HALL_C
@@ -267,8 +268,8 @@ ISR(PCINT0_vect)
 				//PORTD = PHASE_C_GND1;
 				//PORTD = PHASE_C_GND2;
 				PORTD = PHASE_C_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
-				//PORTC = PHASE_A_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
+				TCCR4E = PHASE_A_PWM;
 				break;
 			}
 			case 0x04:			//HALL_C
@@ -278,8 +279,8 @@ ISR(PCINT0_vect)
 				//PORTD = PHASE_C_GND1;
 				//PORTD = PHASE_C_GND2;
 				PORTD = PHASE_C_GND;
-				TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
-				//PORTB = PHASE_B_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
+				TCCR4E = PHASE_B_PWM;
 				break;
 			}
 			default:
@@ -289,7 +290,7 @@ ISR(PCINT0_vect)
 		}	//Klammer Switch
 	}	//Klammer Else
 	
-	//geschwindigkeit_auslesen();
+	geschwindigkeit_auslesen();
 	
 }	//Klammer Pin change
 ISR(INT0_vect)

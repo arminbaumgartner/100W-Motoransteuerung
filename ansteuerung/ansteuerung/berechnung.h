@@ -17,16 +17,18 @@
 
 #include <avr/io.h>
 
-unsigned int step_time;			//Timer 1 Schrittweite (3km/h - 100km/h)
-int timer1_teiler_mult = 16;	//Timer 1 Teiler
+volatile unsigned int steps;	//Timer 1 Schrittweite (3km/h - 100km/h)
+int timer1_teiler_mult = 64;	//Timer 1 Teilerzeit
 int motor_teiler = 3;			//Elektrische Teilung vom Motor
 float uebersetzung = 1;			//Übersetzung
 float raddurchmesser = 0.2;		//In Meter
 
-long drehzahl_pro_sekunde;
-float geschwindigkeit_help;
-unsigned int geschwindigkeit;
-unsigned int drehzahl;
+volatile unsigned int step_dauer;
+volatile unsigned int step_dauer_help;
+volatile unsigned int drehzahl_pro_sekunde;
+volatile float geschwindigkeit_help;
+volatile unsigned int geschwindigkeit;
+volatile unsigned int drehzahl;
 
 void geschwindigkeit_berechnung(void);
 
@@ -40,32 +42,46 @@ void Init_Timer1 (void)
 }
 void geschwindigkeit_auslesen(void)
 {
-	step_time = TCNT1;
+	steps = TCNT1;
 	TCNT1 = 0;
 	
 	geschwindigkeit_berechnung();
+
 }
 void geschwindigkeit_berechnung(void)
 {
 	
-	drehzahl_pro_sekunde = (step_time * timer1_teiler_mult*6)/100;			//Timer 1 Wert * 6 Steps * Übersetzungsverhältnis * 16 -> in µs dauer
+	if(steps < 20)			//Geschwindigkeits überhohung abfangen
+	{
+		steps = 20;
+	}
+
+	step_dauer = steps*timer1_teiler_mult;		//Werte von max 1000*16 ->	16.000	µs
+	step_dauer = step_dauer/100;				//Werte von 3 bis 160
 	
-	/*
-	drehzahl_pro_sekunde = drehzahl_pro_sekunde / 1000000;	//durch 1000*1000 um auf sec zu kommen
 	
-	drehzahl = drehzahl_pro_sekunde * 60;
-	drehzahl = ceil(drehzahl);
+	step_dauer_help = (step_dauer*6*motor_teiler);	//Werte von 54 bis 2880
+	step_dauer_help = step_dauer_help/10;			//Werte von 5 bis 288
+	
+	drehzahl_pro_sekunde = 1000/step_dauer_help;	//Werte von 3 bis 200
+	
+	drehzahl = drehzahl_pro_sekunde*60;
+	
+	geschwindigkeit_help = ((drehzahl_pro_sekunde*raddurchmesser*3.14)/uebersetzung) * 3.6;
+	
+	
+	//drehzahl = ceil(drehzahl);
 	
 	geschwindigkeit_help = ((drehzahl_pro_sekunde * raddurchmesser * 3.14) / uebersetzung) * 3.6;
 	geschwindigkeit = ceil (geschwindigkeit_help);
-	*/
+	
 	
 }
 ISR(TIMER1_OVF_vect)			//Motor steht
 {
-	geschwindigkeit = 1000;
-	drehzahl = 99;
-	drehzahl_pro_sekunde = 2000;
-	step_time = 1000;
+	geschwindigkeit = 0;
+	drehzahl = 0;
+	drehzahl_pro_sekunde = 0;
+	step_dauer = 0;
 	
 }

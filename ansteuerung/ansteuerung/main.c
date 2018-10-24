@@ -102,7 +102,6 @@ int main(void)
 	
     while (1) 
     {		
-		geschwindigkeit_berechnung();
 		
 		x++;
 		_delay_ms(1);
@@ -111,7 +110,7 @@ int main(void)
 		{
 		
 		//dtostrf((float)drehzahl, 5, 0, ausgabe);
-		sprintf(ausgabe,"%d",step_time);
+		sprintf(ausgabe,"%d",drehzahl);
 		LCD_cmd(0x80);   //gehe zu 1. Zeile, 1. Position
 		LCD_string("Drehzahl: ");
 		LCD_cmd(0x8a);   //gehe zu 1. Zeile, 25. Position
@@ -120,9 +119,9 @@ int main(void)
 		LCD_string("U/m");     
 		
 		//dtostrf((float)geschwindigkeit, 5, 0, ausgabe);
-		sprintf(ausgabe,"%ld",drehzahl_pro_sekunde);
+		sprintf(ausgabe,"%d",geschwindigkeit);
 		LCD_cmd(0xC0);   //gehe zu 2. Zeile, 1. Position 
-		LCD_string("Speed:");
+		LCD_string("U/s:");
 		LCD_cmd(0xca);   //gehe zu 2. Zeile, 25. Position
 		LCD_string(ausgabe);
 		LCD_cmd(0xcf);
