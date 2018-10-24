@@ -539,13 +539,13 @@ Disassembly of section .text:
      4bc:	e4 ec       	ldi	r30, 0xC4	; 196
      4be:	f0 e0       	ldi	r31, 0x00	; 0
      4c0:	10 82       	st	Z, r1
-     4c2:	8b b1       	in	r24, 0x0b	; 11
-     4c4:	8f 73       	andi	r24, 0x3F	; 63
-     4c6:	8b b9       	out	0x0b, r24	; 11
-     4c8:	85 b1       	in	r24, 0x05	; 5
-     4ca:	8f 79       	andi	r24, 0x9F	; 159
-     4cc:	80 62       	ori	r24, 0x20	; 32
-     4ce:	85 b9       	out	0x05, r24	; 5
+     4c2:	85 b1       	in	r24, 0x05	; 5
+     4c4:	8f 79       	andi	r24, 0x9F	; 159
+     4c6:	85 b9       	out	0x05, r24	; 5
+     4c8:	8b b1       	in	r24, 0x0b	; 11
+     4ca:	8f 73       	andi	r24, 0x3F	; 63
+     4cc:	80 64       	ori	r24, 0x40	; 64
+     4ce:	8b b9       	out	0x0b, r24	; 11
      4d0:	80 81       	ld	r24, Z
      4d2:	83 60       	ori	r24, 0x03	; 3
      4d4:	80 83       	st	Z, r24
@@ -553,27 +553,27 @@ Disassembly of section .text:
      4d8:	e4 ec       	ldi	r30, 0xC4	; 196
      4da:	f0 e0       	ldi	r31, 0x00	; 0
      4dc:	10 82       	st	Z, r1
-     4de:	85 b1       	in	r24, 0x05	; 5
-     4e0:	8f 79       	andi	r24, 0x9F	; 159
-     4e2:	85 b9       	out	0x05, r24	; 5
+     4de:	88 b1       	in	r24, 0x08	; 8
+     4e0:	8f 73       	andi	r24, 0x3F	; 63
+     4e2:	88 b9       	out	0x08, r24	; 8
      4e4:	8b b1       	in	r24, 0x0b	; 11
      4e6:	8f 73       	andi	r24, 0x3F	; 63
      4e8:	80 64       	ori	r24, 0x40	; 64
      4ea:	8b b9       	out	0x0b, r24	; 11
      4ec:	80 81       	ld	r24, Z
-     4ee:	83 60       	ori	r24, 0x03	; 3
+     4ee:	8c 60       	ori	r24, 0x0C	; 12
      4f0:	80 83       	st	Z, r24
      4f2:	3a c0       	rjmp	.+116    	; 0x568 <__vector_9+0x104>
      4f4:	e4 ec       	ldi	r30, 0xC4	; 196
      4f6:	f0 e0       	ldi	r31, 0x00	; 0
      4f8:	10 82       	st	Z, r1
-     4fa:	88 b1       	in	r24, 0x08	; 8
+     4fa:	8b b1       	in	r24, 0x0b	; 11
      4fc:	8f 73       	andi	r24, 0x3F	; 63
-     4fe:	88 b9       	out	0x08, r24	; 8
-     500:	8b b1       	in	r24, 0x0b	; 11
+     4fe:	8b b9       	out	0x0b, r24	; 11
+     500:	88 b1       	in	r24, 0x08	; 8
      502:	8f 73       	andi	r24, 0x3F	; 63
      504:	80 64       	ori	r24, 0x40	; 64
-     506:	8b b9       	out	0x0b, r24	; 11
+     506:	88 b9       	out	0x08, r24	; 8
      508:	80 81       	ld	r24, Z
      50a:	8c 60       	ori	r24, 0x0C	; 12
      50c:	80 83       	st	Z, r24
@@ -581,27 +581,27 @@ Disassembly of section .text:
      510:	e4 ec       	ldi	r30, 0xC4	; 196
      512:	f0 e0       	ldi	r31, 0x00	; 0
      514:	10 82       	st	Z, r1
-     516:	8b b1       	in	r24, 0x0b	; 11
-     518:	8f 73       	andi	r24, 0x3F	; 63
-     51a:	8b b9       	out	0x0b, r24	; 11
+     516:	85 b1       	in	r24, 0x05	; 5
+     518:	8f 79       	andi	r24, 0x9F	; 159
+     51a:	85 b9       	out	0x05, r24	; 5
      51c:	88 b1       	in	r24, 0x08	; 8
      51e:	8f 73       	andi	r24, 0x3F	; 63
      520:	80 64       	ori	r24, 0x40	; 64
      522:	88 b9       	out	0x08, r24	; 8
      524:	80 81       	ld	r24, Z
-     526:	8c 60       	ori	r24, 0x0C	; 12
+     526:	80 63       	ori	r24, 0x30	; 48
      528:	80 83       	st	Z, r24
      52a:	1e c0       	rjmp	.+60     	; 0x568 <__vector_9+0x104>
      52c:	e4 ec       	ldi	r30, 0xC4	; 196
      52e:	f0 e0       	ldi	r31, 0x00	; 0
      530:	10 82       	st	Z, r1
-     532:	85 b1       	in	r24, 0x05	; 5
-     534:	8f 79       	andi	r24, 0x9F	; 159
-     536:	85 b9       	out	0x05, r24	; 5
-     538:	88 b1       	in	r24, 0x08	; 8
-     53a:	8f 73       	andi	r24, 0x3F	; 63
-     53c:	80 64       	ori	r24, 0x40	; 64
-     53e:	88 b9       	out	0x08, r24	; 8
+     532:	88 b1       	in	r24, 0x08	; 8
+     534:	8f 73       	andi	r24, 0x3F	; 63
+     536:	88 b9       	out	0x08, r24	; 8
+     538:	85 b1       	in	r24, 0x05	; 5
+     53a:	8f 79       	andi	r24, 0x9F	; 159
+     53c:	80 62       	ori	r24, 0x20	; 32
+     53e:	85 b9       	out	0x05, r24	; 5
      540:	80 81       	ld	r24, Z
      542:	80 63       	ori	r24, 0x30	; 48
      544:	80 83       	st	Z, r24
@@ -609,15 +609,15 @@ Disassembly of section .text:
      548:	e4 ec       	ldi	r30, 0xC4	; 196
      54a:	f0 e0       	ldi	r31, 0x00	; 0
      54c:	10 82       	st	Z, r1
-     54e:	88 b1       	in	r24, 0x08	; 8
+     54e:	8b b1       	in	r24, 0x0b	; 11
      550:	8f 73       	andi	r24, 0x3F	; 63
-     552:	88 b9       	out	0x08, r24	; 8
+     552:	8b b9       	out	0x0b, r24	; 11
      554:	85 b1       	in	r24, 0x05	; 5
      556:	8f 79       	andi	r24, 0x9F	; 159
      558:	80 62       	ori	r24, 0x20	; 32
      55a:	85 b9       	out	0x05, r24	; 5
      55c:	80 81       	ld	r24, Z
-     55e:	80 63       	ori	r24, 0x30	; 48
+     55e:	83 60       	ori	r24, 0x03	; 3
      560:	80 83       	st	Z, r24
      562:	02 c0       	rjmp	.+4      	; 0x568 <__vector_9+0x104>
      564:	10 92 c4 00 	sts	0x00C4, r1	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>

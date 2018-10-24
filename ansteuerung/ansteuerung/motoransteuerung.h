@@ -143,10 +143,10 @@ ISR(PCINT0_vect)
 			case 0x05:				//HALL_A + HALL_C
 			{
 				TCCR4E = 0x00;
-				PORTD = PHASE_C_OFF;
-				//PORTB = PHASE_B_GND1;
-				//PORTB = PHASE_B_GND2;
-				PORTB = PHASE_B_GND;
+				PORTB = PHASE_B_OFF;
+				//PORTD = PHASE_C_GND1;
+				//PORTD = PHASE_C_GND2;
+				PORTD = PHASE_C_GND;
 				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
 				TCCR4E = PHASE_A_PWM;
 				break;
@@ -154,17 +154,6 @@ ISR(PCINT0_vect)
 			case 0x01:				//HALL_A
 			{
 				TCCR4E = 0x00;
-				PORTB = PHASE_B_OFF;
-				//PORTD = PHASE_C_GND1;
-				//PORTD = PHASE_C_GND2;
-				PORTD = PHASE_C_GND;
-				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
-				TCCR4E = PHASE_A_PWM;
-				break;
-			}
-			case 0x03:				//HALL_A + HALL_B
-			{
-				TCCR4E = 0x00;
 				PORTC = PHASE_A_OFF;
 				//PORTD = PHASE_C_GND1;
 				//PORTD = PHASE_C_GND2;
@@ -173,7 +162,7 @@ ISR(PCINT0_vect)
 				TCCR4E = PHASE_B_PWM;
 				break;
 			}
-			case 0x02:				//HALL_B
+			case 0x03:				//HALL_A + HALL_B
 			{
 				TCCR4E = 0x00;
 				PORTD = PHASE_C_OFF;
@@ -184,7 +173,7 @@ ISR(PCINT0_vect)
 				TCCR4E = PHASE_B_PWM;
 				break;
 			}
-			case 0x06:			//HALL_B + HALL_C
+			case 0x02:				//HALL_B
 			{
 				TCCR4E = 0x00;
 				PORTB = PHASE_B_OFF;
@@ -193,9 +182,9 @@ ISR(PCINT0_vect)
 				PORTC = PHASE_A_GND;
 				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
 				TCCR4E = PHASE_C_PWM;
-				break;			
+				break;
 			}
-			case 0x04:			//HALL_C
+			case 0x06:			//HALL_B + HALL_C
 			{
 				TCCR4E = 0x00;
 				PORTC = PHASE_A_OFF;
@@ -204,6 +193,17 @@ ISR(PCINT0_vect)
 				PORTB = PHASE_B_GND;
 				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
 				TCCR4E = PHASE_C_PWM;
+				break;			
+			}
+			case 0x04:			//HALL_C
+			{
+				TCCR4E = 0x00;
+				PORTD = PHASE_C_OFF;
+				//PORTB = PHASE_B_GND1;
+				//PORTB = PHASE_B_GND2;
+				PORTB = PHASE_B_GND;
+				//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1);
+				TCCR4E = PHASE_A_PWM;
 				break;
 			}
 			default:
@@ -220,21 +220,21 @@ ISR(PCINT0_vect)
 			case 0x05:			//HALL_A + HALL_C
 			{
 				TCCR4E = 0x00;
-				PORTD = PHASE_C_OFF;
+				PORTB = PHASE_B_OFF;
 				//PORTC = PHASE_A_GND1;
 				//PORTC = PHASE_A_GND2;
 				PORTC = PHASE_A_GND;
-				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
-				TCCR4E = PHASE_B_PWM;
+				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
+				TCCR4E = PHASE_C_PWM;
 				break;
 			}
 			case 0x01:			//HALL_A
 			{
 				TCCR4E = 0x00;
-				PORTB = PHASE_B_OFF;
-				//PORTC = PHASE_A_GND1;
-				//PORTC = PHASE_A_GND2;
-				PORTC = PHASE_A_GND;
+				PORTC = PHASE_A_OFF;
+				//PORTB = PHASE_B_GND1;
+				//PORTB = PHASE_B_GND2;
+				PORTB = PHASE_B_GND;
 				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
 				TCCR4E = PHASE_C_PWM;
 				break;
@@ -242,17 +242,6 @@ ISR(PCINT0_vect)
 			case 0x03:			//HALL_A + HALL_B
 			{
 				TCCR4E = 0x00;
-				PORTC = PHASE_A_OFF;
-				//PORTB = PHASE_B_GND1;
-				//PORTB = PHASE_B_GND2;
-				PORTB = PHASE_B_GND;
-				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
-				TCCR4E = PHASE_C_PWM;
-				break;
-			}
-			case 0x02:			//HALL_B
-			{
-				TCCR4E = 0x00;
 				PORTD = PHASE_C_OFF;
 				//PORTB = PHASE_B_GND1;
 				//PORTB = PHASE_B_GND2;
@@ -261,7 +250,7 @@ ISR(PCINT0_vect)
 				TCCR4E = PHASE_A_PWM;
 				break;
 			}
-			case 0x06:			//HALL_B + HALL_C
+			case 0x02:			//HALL_B
 			{
 				TCCR4E = 0x00;
 				PORTB = PHASE_B_OFF;
@@ -272,13 +261,24 @@ ISR(PCINT0_vect)
 				TCCR4E = PHASE_A_PWM;
 				break;
 			}
-			case 0x04:			//HALL_C
+			case 0x06:			//HALL_B + HALL_C
 			{
 				TCCR4E = 0x00;
 				PORTC = PHASE_A_OFF;
 				//PORTD = PHASE_C_GND1;
 				//PORTD = PHASE_C_GND2;
 				PORTD = PHASE_C_GND;
+				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
+				TCCR4E = PHASE_B_PWM;
+				break;
+			}
+			case 0x04:			//HALL_C
+			{
+				TCCR4E = 0x00;
+				PORTD = PHASE_C_OFF;
+				//PORTC = PHASE_A_GND1;
+				//PORTC = PHASE_A_GND2;
+				PORTC = PHASE_A_GND;
 				//TCCR4E = TCCR4E | (1<<OC4OE2) | (1<<OC4OE3);
 				TCCR4E = PHASE_B_PWM;
 				break;
