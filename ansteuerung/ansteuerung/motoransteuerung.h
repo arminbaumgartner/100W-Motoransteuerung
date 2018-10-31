@@ -88,7 +88,7 @@ void Init_PWM (void){
 	PCMSK0 = PCMSK0 | (1<<PCINT1);		//Enable pin change interrupt on PB1
 	PCMSK0 = PCMSK0 | (1<<PCINT2);		//Enable pin change interrupt on PB2
 	PCMSK0 = PCMSK0 | (1<<PCINT3);		//Enable pin change interrupt on PB3
-	//PCMSK0 = PCMSK0 | (1<<PCINT4);		//Enable pin change interrupt on PB4 für Schalter
+	PCMSK0 = PCMSK0 | (1<<PCINT4);		//Enable pin change interrupt on PB4 für Schalter
 
 	
 	//Externer Interrupt für Umschalter
@@ -128,10 +128,14 @@ ISR(PCINT0_vect)
 	stufe = PINB & 0x0e;
 	stufe = stufe/2;		//herunterbrechen von XXX0 -> 0XXXX			z.b. 1110 -> 0111
 	
-	if(drehzahl <= 100)		//wechsel nur unter 100U/m zulassen
+	if (PINB & (1<<PINB4) == 0x00)	//Schalter abfragen wenn PB4 = LOW
 	{
-		vor = richtung;
+		vor = 1;
 	}
+	else
+	{
+		vor = 0;
+	}	
 	
 	vor=1;		//Test
 	

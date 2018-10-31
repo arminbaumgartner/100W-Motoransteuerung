@@ -83,6 +83,13 @@ int main(void)
 	
 	//UART
 	
+	//Debug-Pin
+	DDRD = DDRD | (1<<DDD0);
+	PORTD = PORTD | (1<<PORTD0);
+	
+	DDRD = DDRD | (1<<DDD4);
+	PORTD = PORTD | (1<<PORTD4);
+	
 	
 	Init_Pinchange();	//Initialisierung Hallsensoren
 	
@@ -90,7 +97,7 @@ int main(void)
 	
 	Init_ADC();			//Initialisierung ADC
 	
-	Init_Timer1 ();		//Initialisierung Berechnungen Geschw. Drehzahl
+	Init_Timer1();		//Initialisierung Berechnungen Geschw. Drehzahl
 	
 	LCD_init();			//Initialisierung  LCD
 	LCD_cmd(0x0C);		//Display ON, Cursor OFF, Blinking OFF 
@@ -108,6 +115,8 @@ int main(void)
 		
 		while(x<1000)
 		{
+		
+		geschwindigkeit_berechnung();
 		
 		//dtostrf((float)drehzahl, 5, 0, ausgabe);
 		sprintf(ausgabe,"%d",drehzahl);

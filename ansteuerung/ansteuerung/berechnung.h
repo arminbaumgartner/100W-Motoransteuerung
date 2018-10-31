@@ -23,20 +23,20 @@ int motor_teiler = 3;			//Elektrische Teilung vom Motor
 float uebersetzung = 1;			//Übersetzung
 float raddurchmesser = 0.2;		//In Meter
 
-volatile unsigned int step_dauer;
-volatile unsigned int step_dauer_help;
-volatile unsigned int drehzahl_pro_sekunde;
+volatile uint16_t step_dauer;
+volatile uint16_t step_dauer_help;
+volatile uint16_t drehzahl_pro_sekunde;
 volatile float geschwindigkeit_help;
-volatile unsigned int geschwindigkeit;
-volatile unsigned int drehzahl;
+volatile uint16_t geschwindigkeit;
+volatile uint16_t drehzahl;
 
 void geschwindigkeit_berechnung(void);
 
 void Init_Timer1 (void)
 {
 	TCCR1B = TCCR1B &~ (1<<CS10);		// Teiler 256 (16MHz / 256 = 16µs)
-	TCCR1B = TCCR1B &~ (1<<CS11);		//Kleiner Schritt 16µs
-	TCCR1B = TCCR1B | (1<<CS12);		//Größter Schritt 16384µs
+	TCCR1B = TCCR1B &~ (1<<CS11);		//Kleiner Schritt 16µs		(1*16µs)
+	TCCR1B = TCCR1B | (1<<CS12);		//Größter Schritt 16384µs	(1024*16µs)
 	
 	TIMSK1 = TIMSK1 | (1<<TOIE1);		//OVERFLOW-Interrupt aktivieren
 }
@@ -45,11 +45,12 @@ void geschwindigkeit_auslesen(void)
 	steps = TCNT1;
 	TCNT1 = 0;
 	
-	geschwindigkeit_berechnung();
+	PORTD = PORTD ^ (1<<PORTD0);
 
 }
 void geschwindigkeit_berechnung(void)
 {
+	PORTD = PORTD ^ (1<<PORTD4);
 	
 	if(steps < 20)			//Geschwindigkeits überhohung abfangen
 	{
