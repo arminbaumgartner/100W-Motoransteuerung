@@ -234,7 +234,7 @@ void LCD_cmd(char data)
 {  
 	char temp = data;
 	
-	PORTB = PORTB & ~(1<<RS); //SFR vom LCD mit RS auf Befehle umschalten
+	PORTB = PORTB &~ (1<<RS); //SFR vom LCD mit RS auf Befehle umschalten
 	      
 	//Upper Nibble senden   
 	if (temp & 0b10000000) { PORTF = PORTF | (1<<DB7); }   

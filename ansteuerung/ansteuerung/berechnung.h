@@ -23,6 +23,8 @@ int motor_teiler = 3;			//Elektrische Teilung vom Motor
 float uebersetzung = 1;			//Übersetzung
 float raddurchmesser = 0.2;		//In Meter
 
+char overflow;
+
 volatile uint16_t step_dauer;
 volatile uint16_t step_dauer_help;
 volatile uint16_t drehzahl_pro_sekunde;
@@ -45,12 +47,12 @@ void geschwindigkeit_auslesen(void)
 	steps = TCNT1;
 	TCNT1 = 0;
 	
-	PORTD = PORTD ^ (1<<PORTD0);
+	//PORTD = PORTD ^ (1<<PORTD0);
 
 }
 void geschwindigkeit_berechnung(void)
 {
-	PORTD = PORTD ^ (1<<PORTD4);
+	//PORTD = PORTD ^ (1<<PORTD4);
 	
 	if(steps < 20)			//Geschwindigkeits überhohung abfangen
 	{
@@ -80,6 +82,8 @@ void geschwindigkeit_berechnung(void)
 }
 ISR(TIMER1_OVF_vect)			//Motor steht
 {
+	overflow = 1;
+	
 	geschwindigkeit = 0;
 	drehzahl = 0;
 	drehzahl_pro_sekunde = 0;

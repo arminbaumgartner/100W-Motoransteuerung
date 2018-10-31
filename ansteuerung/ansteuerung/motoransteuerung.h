@@ -128,16 +128,18 @@ ISR(PCINT0_vect)
 	stufe = PINB & 0x0e;
 	stufe = stufe/2;		//herunterbrechen von XXX0 -> 0XXXX			z.b. 1110 -> 0111
 	
-	if (PINB & (1<<PINB4) == 0x00)	//Schalter abfragen wenn PB4 = LOW
+	
+	//Abrage mit Drehzahl noch nötig
+	if((PINB & (1<<PINB4)) == 0x00)
 	{
+		PORTD = PORTD | (1<<PORTD4);
 		vor = 1;
 	}
 	else
 	{
+		PORTD = PORTD &~ (1<<PORTD4);
 		vor = 0;
-	}	
-	
-	vor=1;		//Test
+	}
 	
 	if(vor)		//Schalter AUS(vorwärts)	ACHTUNG: es wird PINB abgefragt nicht sufe (0x10)
 	{	

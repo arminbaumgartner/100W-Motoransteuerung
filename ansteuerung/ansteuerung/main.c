@@ -83,12 +83,8 @@ int main(void)
 	
 	//UART
 	
-	//Debug-Pin
-	DDRD = DDRD | (1<<DDD0);
-	PORTD = PORTD | (1<<PORTD0);
-	
+	//Debug-Pin	
 	DDRD = DDRD | (1<<DDD4);
-	PORTD = PORTD | (1<<PORTD4);
 	
 	
 	Init_Pinchange();	//Initialisierung Hallsensoren
@@ -108,14 +104,14 @@ int main(void)
 	sei();
 	
     while (1) 
-    {		
+    {	
 		
 		x++;
 		_delay_ms(1);
 		
-		while(x<1000)
+		if(x >= 1000)
 		{
-		
+			
 		geschwindigkeit_berechnung();
 		
 		//dtostrf((float)drehzahl, 5, 0, ausgabe);
@@ -137,6 +133,7 @@ int main(void)
 		LCD_string("km/h"); 
 		
 		x=0;
+		
 		}
 		
     }
