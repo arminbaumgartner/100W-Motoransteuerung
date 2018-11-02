@@ -44,6 +44,7 @@ void Init_Timer1 (void)
 }
 void geschwindigkeit_auslesen(void)
 {
+	overflow = 0;
 	steps = TCNT1;
 	TCNT1 = 0;
 	
