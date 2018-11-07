@@ -7,23 +7,28 @@
  *
  *Dieses Programm dient zur übermittlung der Daten zwischen Akkumanagement und Motorcontroller
  *
- *	
- *
- *	
+ *	Dabei wird UART verwendet
+ *	Timer 0 sorgt für die syncronisation der Datenübertragung
+ *	Für Detail sihe Dokumentation
  *
  *
  */ 
 
 #define F_CPU  16000000UL   //Takt 
-#define BAUD  9600UL    //gewünschte Baudrate 
+#define BAUD  9600UL		//gewünschte Baudrate 
 #define UBRR_CALC (F_CPU/16UL/BAUD-1)  //Baudrtate aus Takt berechnen
 
-char empfangsdaten;
+char start = 0;
 
-char out_text[]="\n\rTaste 'e' ==> LED ein\n\rTaste 'a' ==> LED aus\n\rBitte um Eingabe: \0";       //\n New Line, \r Carrige Return, \0 String Ende 
+char  bf=0;
 
-char i=0;		//Laufvariable für out_text[i] 
-char in;		//Variable für empf. Zeichen
+char i=0;				//laufvariable für empfangdaten[i]
+volatile unsigned char empfangs_daten[3];	//dynamischer Speicher der Akkudaten
+volatile unsigned char akku_daten[3];		//statischer Speicher der Akkudaten
+volatile uint16_t voltage;	//Akku Spannung	0-3650mV
+volatile uint8_t temperatur;//Temperatur	0-120C
+char overflow_counter=0;	//Zählt Overflows für Pause
+
 
 void init_usart (void)
 {  
@@ -49,12 +54,65 @@ void init_usart (void)
 	
 	
 }
+void init_transmission_timer(void)
+{
+	TCCR0A = TCCR0A &~ (1<<COM0A0);		//Normal Port Operations
+	TCCR0A = TCCR0A &~ (1<<COM0A1);
+	
+	TCCR0A = TCCR0A &~ (1<<WGM00);		//Normal Mode
+	TCCR0A = TCCR0A &~ (1<<WGM01);
+	TCCR0B = TCCR0B &~ (1<<WGM02);
+	
+	TCCR0B = TCCR0B &~ (1<<CS00);		//Teiler 256 (16MHz / 256 = 16µs)
+	TCCR0B = TCCR0B &~ (1<<CS01);
+	TCCR0B = TCCR0B | (1<<CS02);
+	
+	OCR0A = 100;	//Compare bei 1,6ms	(16µs * 100 = 1,6ms)
+	
+	TIMSK0 = TIMSK0 | (1<<OCIE0A);		//Interrupt nach 1,6ms
+	//TIMSK0 = TIMSK0 | (1<<TOIE0);		//Overflow Interrupt nach 4ms
+	
+}
+void save_akku_daten(void)
+{
+	for(i=0; i>3; i++)
+	{
+		akku_daten[i] = empfangs_daten[i];
+	}
+	
+	voltage = akku_daten[0];				//LOW Byte der Spannung
+	voltage = voltage | (akku_daten[1]<<8);	//HIGH Byte der Spannung
+	temperatur = akku_daten[2];		//hollen der Temperatur
+	
+	
+}
+
 ISR(USART1_RX_vect)     //Interrupt für Empfang 
 {  
-	while(!(UCSR1A & (1<<RXC1)));   //warten bis Zeichen fertig empfangen  
-	empfangsdaten = UDR1;			//Zeichen in Variable ablegen
-
-	if (in == 'e') {PORTB &=~(1<<PB0);}  //LED PB0 ein  
-	if (in == 'a') {PORTB |= (1<<PB0);}  //LED PB0 aus
-
+	
+	if(start == 1 && overflow_counter >= 5)			//Wenn nicht gerade in Daten ist && pause eingehalten wurde		//5*1,6ms = 8ms
+	{
+		
+		TCNT0 = 0;					//nötig um nicht in de overflow zu geraten
+		overflow_counter = 0;		//Counter wird auf 0 gesetzt
+		
+		for(i=0; i<3; i++)
+		{
+			while(!(UCSR1A & (1<<RXC1)));   //warten bis Zeichen fertig empfangen
+			empfangs_daten[i] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		}
+	}
+}
+ISR (TIMER0_COMPA_vect)
+{
+	TCNT0 = 0;
+	start = 1;
+	
+	overflow_counter++;		//Zählen der Overflows
+	
+	if(overflow_counter >= 3)		//nach 3*1,6ms= 4,8ms werden Daten gespeichert
+	{
+		save_akku_daten();
+	}
+	
 }

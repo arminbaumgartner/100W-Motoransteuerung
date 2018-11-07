@@ -5,7 +5,7 @@
  * Author : Armin
  *
  *
- *Dieses Programm dient zur Berechnung des Motors
+ *Dieses Programm dient zur Berechnung der Fahrdaten
  *
  *	Geschwindgkeits / Umdrehungen pro min berrechnung durch Timer 1
  *	Erkennung des Stilstandes durch Timer 1
@@ -17,7 +17,7 @@
 
 #include <avr/io.h>
 
-volatile unsigned int steps;	//Timer 1 Schrittweite (3km/h - 100km/h)
+volatile uint16_t steps;	//Timer 1 Schrittweite (3km/h - 100km/h)
 int timer1_teiler_mult = 64;	//Timer 1 Teilerzeit
 int motor_teiler = 3;			//Elektrische Teilung vom Motor
 float uebersetzung = 1;			//Übersetzung
@@ -38,12 +38,13 @@ void Init_Timer1 (void)
 {
 	TCCR1B = TCCR1B &~ (1<<CS10);		// Teiler 256 (16MHz / 256 = 16µs)
 	TCCR1B = TCCR1B &~ (1<<CS11);		//Kleiner Schritt 16µs		(1*16µs)
-	TCCR1B = TCCR1B | (1<<CS12);		//Größter Schritt 16384µs	(1024*16µs)
+	TCCR1B = TCCR1B | (1<<CS12);		//Größter Schritt 1,05s	(65535*16µs)
 	
 	TIMSK1 = TIMSK1 | (1<<TOIE1);		//OVERFLOW-Interrupt aktivieren
 }
 void geschwindigkeit_auslesen(void)
 {
+	overflow = 0;
 	steps = TCNT1;
 	TCNT1 = 0;
 	
@@ -59,8 +60,8 @@ void geschwindigkeit_berechnung(void)
 		steps = 20;
 	}
 
-	step_dauer = steps*timer1_teiler_mult;		//Werte von max 1000*16 ->	16.000	µs
-	step_dauer = step_dauer/100;				//Werte von 3 bis 160
+	step_dauer = steps*timer1_teiler_mult;		//Werte von max 65000*16 ->	1,04s
+	step_dauer = step_dauer/100;				//Werte von 3 bis 160				///////ab hier korriegieren /// Teiler vieleicht auf 64 statt 256
 	
 	
 	step_dauer_help = (step_dauer*6*motor_teiler);	//Werte von 54 bis 2880

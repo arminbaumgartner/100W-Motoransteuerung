@@ -29,6 +29,7 @@
 #include "motoransteuerung.h"
 #include "lcd.h"
 #include "kommunikation.h"
+#include "datenverarbeitung.h"
 
 char ausgabe[10];
 int x=0;
@@ -95,6 +96,10 @@ int main(void)
 	
 	Init_Timer1();		//Initialisierung Berechnungen Geschw. Drehzahl
 	
+	init_usart();				//Initialisierung von Kommunikationsschnittstelle UART
+	init_transmission_timer();	//Initaliesierung von Timer0 für UART
+	
+	
 	LCD_init();			//Initialisierung  LCD
 	LCD_cmd(0x0C);		//Display ON, Cursor OFF, Blinking OFF 
 	
@@ -111,8 +116,16 @@ int main(void)
 		
 		if(x >= 1000)
 		{
-			
-		geschwindigkeit_berechnung();
+		
+		if(overflow)
+		{
+			//geschwindigkeit bleibt auf 0
+		}
+		else
+		{
+			geschwindigkeit_berechnung();
+		}
+		
 		
 		//dtostrf((float)drehzahl, 5, 0, ausgabe);
 		sprintf(ausgabe,"%d",drehzahl);
