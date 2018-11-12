@@ -56,9 +56,9 @@ int main(void)
 	DDRB = DDRB &~ (1<<DDB1);	//PCINT1-Pin (PB1) als INPUT	//HALL A
 	DDRB = DDRB &~ (1<<DDB2);	//PCINT2-Pin (PB2) als INPUT	//HALL B
 	DDRB = DDRB &~ (1<<DDB3);	//PCINT3-Pin (PB3) als INPUT	//HALL C
-	PORTB = PORTB | (1<<PORTB1);	//PULL-UP
-	PORTB = PORTB | (1<<PORTB2);	//PULL-UP
-	PORTB = PORTB | (1<<PORTB3);	//PULL-UP
+	PORTB = PORTB &~ (1<<PORTB1);	//PULL-UP
+	PORTB = PORTB &~ (1<<PORTB2);	//PULL-UP
+	PORTB = PORTB &~ (1<<PORTB3);	//PULL-UP
 
 	//Vorwärts - Rückwärts Schalter
 	DDRD = DDRD &~ (1<<DDD0);		//PD0 als INPUT //vorwärts / rückwärts Schalter
@@ -83,9 +83,10 @@ int main(void)
 	DDRF = DDRF | (1<<PORTF4);		//LCD-DB4 (PF1 µC) als OUTPUT
 	
 	//UART
+	PORTD = PORTD | (1<<PORTD2);		// pull up um keine störungen einzufangen
 	
 	//Debug-Pin	
-	DDRD = DDRD | (1<<DDD4);
+	DDRD = DDRD | (1<<DDD4);		
 	
 	
 	Init_Pinchange();	//Initialisierung Hallsensoren
@@ -102,6 +103,8 @@ int main(void)
 	
 	LCD_init();			//Initialisierung  LCD
 	LCD_cmd(0x0C);		//Display ON, Cursor OFF, Blinking OFF 
+	
+	Hallsensoren_abfragen();
 	
 	
 	PORTE = PORTE &~ (PORTE6);	//Shutdown-Pin auf LOW -> um Treiber einzuschalten
@@ -139,7 +142,7 @@ int main(void)
 		//dtostrf((float)geschwindigkeit, 5, 0, ausgabe);
 		sprintf(ausgabe,"%d",geschwindigkeit);
 		LCD_cmd(0xC0);   //gehe zu 2. Zeile, 1. Position 
-		LCD_string("U/s:");
+		LCD_string("Speed:");
 		LCD_cmd(0xca);   //gehe zu 2. Zeile, 25. Position
 		LCD_string(ausgabe);
 		LCD_cmd(0xcf);

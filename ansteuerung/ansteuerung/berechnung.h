@@ -18,7 +18,7 @@
 #include <avr/io.h>
 
 volatile uint16_t steps;	//Timer 1 Schrittweite (3km/h - 100km/h)
-int timer1_teiler_mult = 64;	//Timer 1 Teilerzeit
+int timer1_teiler_mult = 4;	//Timer 1 Teilerzeit
 int motor_teiler = 3;			//Elektrische Teilung vom Motor
 float uebersetzung = 1;			//Übersetzung
 float raddurchmesser = 0.2;		//In Meter
@@ -36,9 +36,9 @@ void geschwindigkeit_berechnung(void);
 
 void Init_Timer1 (void)
 {
-	TCCR1B = TCCR1B &~ (1<<CS10);		// Teiler 256 (16MHz / 256 = 16µs)
-	TCCR1B = TCCR1B &~ (1<<CS11);		//Kleiner Schritt 16µs		(1*16µs)
-	TCCR1B = TCCR1B | (1<<CS12);		//Größter Schritt 1,05s	(65535*16µs)
+	TCCR1B = TCCR1B | (1<<CS10);		// Teiler 256 (16MHz / 64 = 4µs)
+	TCCR1B = TCCR1B | (1<<CS11);		//Kleiner Schritt 4µs		(1*4µs)
+	TCCR1B = TCCR1B &~ (1<<CS12);		//Größter Schritt 262ms	(65535*4µs)
 	
 	TIMSK1 = TIMSK1 | (1<<TOIE1);		//OVERFLOW-Interrupt aktivieren
 }
@@ -48,26 +48,31 @@ void geschwindigkeit_auslesen(void)
 	steps = TCNT1;
 	TCNT1 = 0;
 	
-	//PORTD = PORTD ^ (1<<PORTD0);
 
 }
 void geschwindigkeit_berechnung(void)
 {
-	//PORTD = PORTD ^ (1<<PORTD4);
 	
-	if(steps < 20)			//Geschwindigkeits überhohung abfangen
+	if(steps <= 25)			//Geschwindigkeits überhohung abfangen -> 25*4 = 100
 	{
-		steps = 20;
+		steps = 25;
 	}
+	
+	
+	if(steps >= 13750)		//Geschwindigkeits unterschreitung -> 13.750 nötig um 1 U/s zu generieren
+	{
+		steps=13750;
+	}
+	
 
-	step_dauer = steps*timer1_teiler_mult;		//Werte von max 65000*16 ->	1,04s
-	step_dauer = step_dauer/100;				//Werte von 3 bis 160				///////ab hier korriegieren /// Teiler vieleicht auf 64 statt 256
+	step_dauer = steps*timer1_teiler_mult;		//Werte von max 55.000µs um auf 1U/s zu kommen
+	step_dauer = step_dauer/100;				//Werte von 1 bis 550				///////ab hier korriegieren /// Teiler vieleicht auf 64 statt 256
 	
 	
-	step_dauer_help = (step_dauer*6*motor_teiler);	//Werte von 54 bis 2880
-	step_dauer_help = step_dauer_help/10;			//Werte von 5 bis 288
+	step_dauer_help = (step_dauer*6*motor_teiler);	//Werte von 18 bis 9900
+	step_dauer_help = step_dauer_help/10;			//Werte von 1 bis 990
 	
-	drehzahl_pro_sekunde = 1000/step_dauer_help;	//Werte von 3 bis 200
+	drehzahl_pro_sekunde = 1000/step_dauer_help;	//Werte von 1 bis 1000
 	
 	drehzahl = drehzahl_pro_sekunde*60;
 	

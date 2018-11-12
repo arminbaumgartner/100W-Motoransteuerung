@@ -66,7 +66,7 @@ void Init_PWM (void){
 	TCCR4C = TCCR4C | (1<<COM4D0);
 	TCCR4C = TCCR4C &~ (1<<COM4D1);
 	
-	TCCR4B = TCCR4B | (1<<DTPS40);		//Death Time presacler auf 1
+	TCCR4B = TCCR4B &~ (1<<DTPS40);		//Death Time presacler auf 1
 	TCCR4B = TCCR4B &~ (1<<DTPS41);
 	
 	//TCCR4B = TCCR4B | (1<<PWM4X);		//Inversion mode -> kann die ausgänge invertieren bei 1
@@ -78,7 +78,7 @@ void Init_PWM (void){
 	
 	TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1); //Start Ausgang
 	
-	DT4 = 0xFF;							//Death time
+	DT4 = 0x88;							//Death time
 	
 }
  void Init_Pinchange( void )
@@ -122,9 +122,8 @@ void Init_PWM (void){
 	 ADCSRA = ADCSRA | (1<<ADSC);	//Wandlung starten
 	 
  }
-ISR(PCINT0_vect)
+void Hallsensoren_abfragen(void)
 {
-	
 	stufe = PINB & 0x0e;
 	stufe = stufe/2;		//herunterbrechen von XXX0 -> 0XXXX			z.b. 1110 -> 0111
 	
@@ -142,8 +141,8 @@ ISR(PCINT0_vect)
 	}
 	
 	if(vor)		//Schalter AUS(vorwärts)	ACHTUNG: es wird PINB abgefragt nicht sufe (0x10)
-	{	
-			
+	{
+		
 		switch(stufe)
 		{
 			case 0x05:				//HALL_A + HALL_C
@@ -199,7 +198,7 @@ ISR(PCINT0_vect)
 				PORTB = PHASE_B_GND;
 				//TCCR4E = TCCR4E | (1<<OC4OE5)|(1<<OC4OE4);
 				TCCR4E = PHASE_C_PWM;
-				break;			
+				break;
 			}
 			case 0x04:			//HALL_C
 			{
@@ -294,7 +293,12 @@ ISR(PCINT0_vect)
 				TCCR4E = 0x00;
 			}
 		}	//Klammer Switch
-	}	//Klammer Else
+	}
+}
+ISR(PCINT0_vect)
+{
+	
+	Hallsensoren_abfragen();
 	
 	geschwindigkeit_auslesen();
 	
@@ -319,7 +323,7 @@ ISR(ADC_vect)						//Löst aus, wenn die Konversation beendet ist
 	if(adc_high >= 250)
 	{
 		adc_high = 250;
-	}
+	}	
 	OCR4A = adc_high;
 	ADCSRA = ADCSRA | (1<<ADSC);	//Wandlung starten
 }

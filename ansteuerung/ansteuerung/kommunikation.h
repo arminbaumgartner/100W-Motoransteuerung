@@ -29,6 +29,9 @@ volatile uint16_t voltage;	//Akku Spannung	0-3650mV
 volatile uint8_t temperatur;//Temperatur	0-120C
 char overflow_counter=0;	//Zählt Overflows für Pause
 
+char empfang_test;
+
+
 
 void init_usart (void)
 {  
@@ -75,6 +78,7 @@ void init_transmission_timer(void)
 }
 void save_akku_daten(void)
 {
+	/*
 	for(i=0; i>3; i++)
 	{
 		akku_daten[i] = empfangs_daten[i];
@@ -83,6 +87,24 @@ void save_akku_daten(void)
 	voltage = akku_daten[0];				//LOW Byte der Spannung
 	voltage = voltage | (akku_daten[1]<<8);	//HIGH Byte der Spannung
 	temperatur = akku_daten[2];		//hollen der Temperatur
+	*/
+	
+	akku_daten[0] = empfangs_daten[0];
+	akku_daten[1] = empfangs_daten[1];
+	akku_daten[2] = empfangs_daten[2];
+	
+	voltage = akku_daten[0];				//LOW Byte der Spannung
+	voltage = voltage | (akku_daten[1]<<8);	//HIGH Byte der Spannung
+	temperatur=akku_daten[2];
+	
+	
+	if(empfangs_daten[0] >= 10)
+	{
+		PORTD = PORTD ^ (1<<PORTD4);
+	}
+	
+	
+	
 	
 	
 }
@@ -90,17 +112,30 @@ void save_akku_daten(void)
 ISR(USART1_RX_vect)     //Interrupt für Empfang 
 {  
 	
+	
 	if(start == 1 && overflow_counter >= 5)			//Wenn nicht gerade in Daten ist && pause eingehalten wurde		//5*1,6ms = 8ms
 	{
 		
+		
 		TCNT0 = 0;					//nötig um nicht in de overflow zu geraten
 		overflow_counter = 0;		//Counter wird auf 0 gesetzt
-		
+		/*
 		for(i=0; i<3; i++)
 		{
 			while(!(UCSR1A & (1<<RXC1)));   //warten bis Zeichen fertig empfangen
 			empfangs_daten[i] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
 		}
+		*/
+		
+		while( !(UCSR1A & (1<<RXC1)) );   //warten bis Zeichen fertig empfangen
+		empfangs_daten[0] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		while( !(UCSR1A & (1<<RXC1)) );   //warten bis Zeichen fertig empfangen
+		empfangs_daten[2] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		while( !(UCSR1A & (1<<RXC1)) );   //warten bis Zeichen fertig empfangen
+		empfangs_daten[3] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		
+		
+				
 	}
 }
 ISR (TIMER0_COMPA_vect)
@@ -108,9 +143,10 @@ ISR (TIMER0_COMPA_vect)
 	TCNT0 = 0;
 	start = 1;
 	
+	
 	overflow_counter++;		//Zählen der Overflows
 	
-	if(overflow_counter >= 3)		//nach 3*1,6ms= 4,8ms werden Daten gespeichert
+	if(overflow_counter == 3)		//nach 3*1,6ms= 4,8ms werden Daten gespeichert
 	{
 		save_akku_daten();
 	}
