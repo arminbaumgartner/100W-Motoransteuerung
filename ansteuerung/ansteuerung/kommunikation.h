@@ -25,11 +25,10 @@ char  bf=0;
 char i=0;				//laufvariable für empfangdaten[i]
 volatile unsigned char empfangs_daten[3];	//dynamischer Speicher der Akkudaten
 volatile unsigned char akku_daten[3];		//statischer Speicher der Akkudaten
-volatile uint16_t voltage;	//Akku Spannung	0-3650mV
-volatile uint8_t temperatur;//Temperatur	0-120C
 char overflow_counter=0;	//Zählt Overflows für Pause
 
 char empfang_test;
+
 
 
 
@@ -51,7 +50,7 @@ void init_usart (void)
 	
 	UCSR1C = UCSR1C | (1<<UCSZ10);		//8-Bit data
 	UCSR1C = UCSR1C | (1<<UCSZ11);
-	UCSR1C = UCSR1C &~ (1<<UCSZ12);
+	UCSR1B = UCSR1B &~ (1<<UCSZ12);
 	
 	UCSR1C = UCSR1C &~ (UCPOL1);		//muss low sein im asynchron mode
 	
@@ -78,32 +77,21 @@ void init_transmission_timer(void)
 }
 void save_akku_daten(void)
 {
+		
+	akku_daten[0] = empfangs_daten[0];		//Temperatur
+	akku_daten[1] = empfangs_daten[1];		//Low-Spannung
+	akku_daten[2] = empfangs_daten[2];		//High-Spannung
+	
+	daten_aufteilen();
+	
 	/*
-	for(i=0; i>3; i++)
-	{
-		akku_daten[i] = empfangs_daten[i];
-	}
 	
-	voltage = akku_daten[0];				//LOW Byte der Spannung
-	voltage = voltage | (akku_daten[1]<<8);	//HIGH Byte der Spannung
-	temperatur = akku_daten[2];		//hollen der Temperatur
-	*/
-	
-	akku_daten[0] = empfangs_daten[0];
-	akku_daten[1] = empfangs_daten[1];
-	akku_daten[2] = empfangs_daten[2];
-	
-	voltage = akku_daten[0];				//LOW Byte der Spannung
-	voltage = voltage | (akku_daten[1]<<8);	//HIGH Byte der Spannung
-	temperatur=akku_daten[2];
-	
-	
-	if(empfangs_daten[0] >= 10)
+	if(akku_daten[0] == 0b01010101)
 	{
 		PORTD = PORTD ^ (1<<PORTD4);
 	}
 	
-	
+	*/
 	
 	
 	
@@ -128,11 +116,11 @@ ISR(USART1_RX_vect)     //Interrupt für Empfang
 		*/
 		
 		while( !(UCSR1A & (1<<RXC1)) );   //warten bis Zeichen fertig empfangen
-		empfangs_daten[0] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		empfangs_daten[0] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B			//Temperatur
 		while( !(UCSR1A & (1<<RXC1)) );   //warten bis Zeichen fertig empfangen
-		empfangs_daten[2] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		empfangs_daten[1] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B			//LOW-Spannung
 		while( !(UCSR1A & (1<<RXC1)) );   //warten bis Zeichen fertig empfangen
-		empfangs_daten[3] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B
+		empfangs_daten[2] = UDR1;		//Zeichen in Variable ablegen	//UDR1 -> 8 Bit daten 9.Bit wäre in UCSR1B			//HIGH-Spannung
 		
 		
 				
