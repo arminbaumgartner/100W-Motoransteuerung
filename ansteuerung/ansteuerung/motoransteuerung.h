@@ -76,9 +76,10 @@ void Init_PWM (void){
 	OCR4C = 255;						//200*500ns = 100µs = 10kHz  //umgeändert auf 255 test zwecke
 	OCR4A = 150;
 	
-	TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1); //Start Ausgang
+	//TCCR4E = TCCR4E | (1<<OC4OE0)|(1<<OC4OE1); //Start Ausgang
+	TCCR4E = 0x00;
 	
-	DT4 = 0x88;							//Death time
+	DT4 = 0xff;		//500ns = 0x88;					//Death time
 	
 }
  void Init_Pinchange( void )
@@ -131,12 +132,10 @@ void Hallsensoren_abfragen(void)
 	//Abrage mit Drehzahl noch nötig
 	if((PINB & (1<<PINB4)) == 0x00)
 	{
-		PORTD = PORTD | (1<<PORTD4);
 		vor = 1;
 	}
 	else
 	{
-		PORTD = PORTD &~ (1<<PORTD4);
 		vor = 0;
 	}
 	
@@ -301,6 +300,7 @@ ISR(PCINT0_vect)
 	Hallsensoren_abfragen();
 	
 	geschwindigkeit_auslesen();
+
 	
 }	//Klammer Pin change
 ISR(INT0_vect)

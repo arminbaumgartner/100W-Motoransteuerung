@@ -69,3 +69,12 @@ int akku_ladestand (uint16_t spannung)
 	return ladestand;
 	
 }
+
+void akku_daten_einbeziehen (uint8_t ladestand, uint8_t temp)
+{
+	if(ladestand == 10)
+	{
+		
+		
+	}
+}

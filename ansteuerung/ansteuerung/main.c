@@ -31,8 +31,12 @@
 #include "kommunikation.h"
 #include "datenverarbeitung.h"
 
+void init_timer_zeitlicher_ablauf(void);
+
 char ausgabe[10];
 int x=0;
+
+char zeitlicher_ablauf=0;
 
 
 int main(void)
@@ -56,9 +60,9 @@ int main(void)
 	DDRB = DDRB &~ (1<<DDB1);	//PCINT1-Pin (PB1) als INPUT	//HALL A
 	DDRB = DDRB &~ (1<<DDB2);	//PCINT2-Pin (PB2) als INPUT	//HALL B
 	DDRB = DDRB &~ (1<<DDB3);	//PCINT3-Pin (PB3) als INPUT	//HALL C
-	PORTB = PORTB &~ (1<<PORTB1);	//PULL-UP
-	PORTB = PORTB &~ (1<<PORTB2);	//PULL-UP
-	PORTB = PORTB &~ (1<<PORTB3);	//PULL-UP
+	PORTB = PORTB &~ (1<<PORTB1);	//PULL-UP aus
+	PORTB = PORTB &~ (1<<PORTB2);	//PULL-UP aus
+	PORTB = PORTB &~ (1<<PORTB3);	//PULL-UP aus
 
 	//Vorwärts - Rückwärts Schalter
 	DDRD = DDRD &~ (1<<DDD0);		//PD0 als INPUT //vorwärts / rückwärts Schalter
@@ -85,8 +89,9 @@ int main(void)
 	//UART
 	PORTD = PORTD | (1<<PORTD2);		// pull up um keine störungen einzufangen
 	
-	//Debug-Pin	
+	//Debug-Pins
 	DDRD = DDRD | (1<<DDD4);		
+	DDRB = DDRB | (1<<DDB7);
 	
 	
 	Init_Pinchange();	//Initialisierung Hallsensoren
@@ -107,12 +112,31 @@ int main(void)
 	Hallsensoren_abfragen();
 	
 	
-	PORTE = PORTE &~ (PORTE6);	//Shutdown-Pin auf LOW -> um Treiber einzuschalten
+	
 	
 	sei();
 	
+	LCD_cmd(0x80);   //gehe zu 1. Zeile, 1. Position
+	LCD_string("Drehzahl: ");
+	LCD_cmd(0x8f);
+	LCD_string("U/m");
+	
+	LCD_cmd(0xC0);   //gehe zu 2. Zeile, 1. Position
+	LCD_string("Speed:");
+	LCD_cmd(0xcf);
+	LCD_string("km/h");
+	
+	
+	_delay_ms(2000);
+	PORTE = PORTE &~ (PORTE6);	//Shutdown-Pin auf LOW -> um Treiber einzuschalten
+	
+	//Für Anfangsausgabe
+	drehzahl=0;
+	geschwindigkeit=0;
+	
     while (1) 
     {	
+		
 		
 		x++;
 		_delay_ms(1);
@@ -120,34 +144,35 @@ int main(void)
 		if(x >= 1000)
 		{
 		
-		if(overflow)
-		{
-			//geschwindigkeit bleibt auf 0
-		}
-		else
-		{
-			geschwindigkeit_berechnung();
-		}
+		PORTD = PORTD ^ (1<<PORTD4);
+		PORTB = PORTB ^ (1<<PORTB7);
+
+		geschwindigkeit_berechnung();
+			
 		
 		
+
 		//dtostrf((float)drehzahl, 5, 0, ausgabe);
+		sprintf(ausgabe,"    ");
+		LCD_cmd(0x8b);   //gehe zu 1. Zeile, 25. Position
+		LCD_string(ausgabe);
+		
 		sprintf(ausgabe,"%d",drehzahl);
-		LCD_cmd(0x80);   //gehe zu 1. Zeile, 1. Position
-		LCD_string("Drehzahl: ");
 		LCD_cmd(0x8a);   //gehe zu 1. Zeile, 25. Position
 		LCD_string(ausgabe); 
-		LCD_cmd(0x8f);
-		LCD_string("U/m");     
+
+		
 		
 		//dtostrf((float)geschwindigkeit, 5, 0, ausgabe);
+		sprintf(ausgabe,"    ");
+		LCD_cmd(0xcb);   //gehe zu 2. Zeile, 25. Position
+		LCD_string(ausgabe);
+		
 		sprintf(ausgabe,"%d",geschwindigkeit);
-		LCD_cmd(0xC0);   //gehe zu 2. Zeile, 1. Position 
-		LCD_string("Speed:");
 		LCD_cmd(0xca);   //gehe zu 2. Zeile, 25. Position
 		LCD_string(ausgabe);
-		LCD_cmd(0xcf);
-		LCD_string("km/h"); 
 		
+		//zeitlicher_ablauf=0;
 		x=0;
 		
 		}
@@ -156,3 +181,23 @@ int main(void)
 	
 }
 
+void init_timer_zeitlicher_ablauf(void)
+{
+	
+	
+	TCCR3B = TCCR3B | (1<<CS10);		// Teiler 256 (16MHz / 64 = 4µs)
+	TCCR3B = TCCR3B | (1<<CS11);		//Kleiner Schritt 4µs		(1*4µs)
+	TCCR3B = TCCR3B &~ (1<<CS12);		//Größter Schritt 262ms	(65535*4µs)
+	
+	TIMSK3 = TIMSK3 | (1<<OCIE3A);		//OC3A interrupt
+	
+	OCR3A = 25000;		//25000*4µs = 100ms
+	
+}
+
+ISR(TIMER3_COMPA_vect)
+{
+	zeitlicher_ablauf++;
+	
+
+}

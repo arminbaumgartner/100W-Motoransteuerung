@@ -88,7 +88,7 @@ void save_akku_daten(void)
 	
 	if(akku_daten[0] == 0b01010101)
 	{
-		PORTD = PORTD ^ (1<<PORTD4);
+		//Debug Pin
 	}
 	
 	*/
