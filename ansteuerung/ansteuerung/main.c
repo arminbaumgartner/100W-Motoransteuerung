@@ -36,7 +36,11 @@ void init_timer_zeitlicher_ablauf(void);
 char ausgabe[10];
 int x=0;
 
-char zeitlicher_ablauf=0;
+volatile char zeitlicher_ablauf=0;
+
+uint16_t testen = 3000;
+
+uint8_t ladestand_test = 0;
 
 
 int main(void)
@@ -106,6 +110,9 @@ int main(void)
 	init_transmission_timer();	//Initaliesierung von Timer0 für UART
 	
 	
+	init_timer_zeitlicher_ablauf();
+	
+	
 	LCD_init();			//Initialisierung  LCD
 	LCD_cmd(0x0C);		//Display ON, Cursor OFF, Blinking OFF 
 	
@@ -134,48 +141,51 @@ int main(void)
 	drehzahl=0;
 	geschwindigkeit=0;
 	
+	zeitlicher_ablauf=0;
+	
     while (1) 
     {	
 		
+		//x++;
+		//_delay_ms(1);
 		
-		x++;
-		_delay_ms(1);
-		
-		if(x >= 1000)
+		if(zeitlicher_ablauf >= 10)
 		{
-		
-		PORTD = PORTD ^ (1<<PORTD4);
-		PORTB = PORTB ^ (1<<PORTB7);
-
-		geschwindigkeit_berechnung();
 			
-		
-		
+			PORTD = PORTD ^ (1<<PORTD4);
 
-		//dtostrf((float)drehzahl, 5, 0, ausgabe);
-		sprintf(ausgabe,"    ");
-		LCD_cmd(0x8b);   //gehe zu 1. Zeile, 25. Position
-		LCD_string(ausgabe);
+			geschwindigkeit_berechnung();
+			ladestand_test = akku_ladestand(testen);
+			
+			if(ladestand_test >= 45)
+			{
+				PORTB = PORTB ^ (1<<PORTB7);
+			}
+
+			//dtostrf((float)drehzahl, 5, 0, ausgabe);
+			sprintf(ausgabe,"    ");
+			LCD_cmd(0x8b);   //gehe zu 1. Zeile, 25. Position
+			LCD_string(ausgabe);
 		
-		sprintf(ausgabe,"%d",drehzahl);
-		LCD_cmd(0x8a);   //gehe zu 1. Zeile, 25. Position
-		LCD_string(ausgabe); 
+			sprintf(ausgabe,"%d",drehzahl);
+			LCD_cmd(0x8a);   //gehe zu 1. Zeile, 25. Position
+			LCD_string(ausgabe); 
 
 		
 		
-		//dtostrf((float)geschwindigkeit, 5, 0, ausgabe);
-		sprintf(ausgabe,"    ");
-		LCD_cmd(0xcb);   //gehe zu 2. Zeile, 25. Position
-		LCD_string(ausgabe);
+			//dtostrf((float)geschwindigkeit, 5, 0, ausgabe);
+			sprintf(ausgabe,"    ");
+			LCD_cmd(0xcb);   //gehe zu 2. Zeile, 25. Position
+			LCD_string(ausgabe);
 		
-		sprintf(ausgabe,"%d",geschwindigkeit);
-		LCD_cmd(0xca);   //gehe zu 2. Zeile, 25. Position
-		LCD_string(ausgabe);
+			sprintf(ausgabe,"%d",geschwindigkeit);
+			LCD_cmd(0xca);   //gehe zu 2. Zeile, 25. Position
+			LCD_string(ausgabe);
 		
-		//zeitlicher_ablauf=0;
-		x=0;
+			zeitlicher_ablauf=0;
+			//x=0;
 		
-		}
+			}
 		
     }
 	
@@ -191,12 +201,24 @@ void init_timer_zeitlicher_ablauf(void)
 	
 	TIMSK3 = TIMSK3 | (1<<OCIE3A);		//OC3A interrupt
 	
-	OCR3A = 25000;		//25000*4µs = 100ms
+	OCR3A = 2500;		//25000*4µs = 100ms
+	//OCR3AH =  97;
+	//OCR3AL = 168;
 	
 }
 
 ISR(TIMER3_COMPA_vect)
 {
+	TCNT3 = 0;
+	
+	
+	
+	if(zeitlicher_ablauf >= 25)
+	{
+		
+		zeitlicher_ablauf=0;
+	}
+	
 	zeitlicher_ablauf++;
 	
 

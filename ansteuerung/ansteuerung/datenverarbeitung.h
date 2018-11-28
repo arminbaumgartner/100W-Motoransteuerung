@@ -37,6 +37,7 @@ int akku_ladestand (uint16_t spannung)
 {
 	uint8_t ladestand=100;
 	
+	/*
 	if(spannung >= LADUNG100)
 	{
 		ladestand = 100;
@@ -65,6 +66,9 @@ int akku_ladestand (uint16_t spannung)
 	{
 		ladestand = 0;
 	}
+	*/
+	
+	ladestand = (spannung - LADUNG00)/4;
 	
 	return ladestand;
 	
